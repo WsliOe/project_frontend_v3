@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { login as loginApi } from "../../services/apiAuth";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
-import { toast } from "react-hot-toast";
+import toast from "react-hot-toast";
 
 export function useLogin() {
   const queryClient = useQueryClient();

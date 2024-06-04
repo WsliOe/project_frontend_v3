@@ -18,10 +18,10 @@ export async function getHours() {
     throw new Error(data.message);
   }
 
-  return data.data.hours;
+  return data.data.data;
 }
 
-export async function sendHours({ data }) {
+export async function sendHours(data) {
   const url = API_URL;
   const options = {
     method: "POST",
@@ -34,6 +34,7 @@ export async function sendHours({ data }) {
 
   const response = await fetch(url, options);
   const dataRes = await response.json();
+
   if (dataRes.status !== "success") {
     throw new Error(dataRes.status);
   }
@@ -61,7 +62,7 @@ export async function updateHours({ hoursId, data }) {
   return dataRes;
 }
 
-export async function deleteHours({ hoursId }) {
+export async function deleteHours(hoursId) {
   const url = `${API_URL}/${hoursId}`;
 
   const options = {
@@ -79,53 +80,3 @@ export async function deleteHours({ hoursId }) {
 
   return response;
 }
-
-/*import axios from "axios";
-
-
-export async function getHours() {
-  try {
-    const response = await axios.get("http://localhost:3000/api/v1/hours");
-    return response.data;
-  } catch (error) {
-    console.error(error);
-    throw new Error("Hours could not be loaded");
-  }
-}
-
-export async function createEditHours(newHours, id) {
-  try {
-    if (!id) {
-      // A) CREATE
-      const response = await axios.post(
-        "http://localhost:3000/api/v1/hours",
-        newHours
-      );
-      return response.data;
-    } else {
-      // B) EDIT
-      const response = await axios.put(
-        `http://localhost:3000/api/v1/hours/${id}`,
-        newHours
-      );
-      return response.data;
-    }
-  } catch (error) {
-    console.error(error);
-    throw new Error("Hours could not be created or edited");
-  }
-}
-
-export async function deleteHours(id) {
-  try {
-    const response = await axios.delete(
-      `http://localhost:3000/api/v1/hours/${id}`
-    );
-    return response.data;
-  } catch (error) {
-    console.error(error);
-    throw new Error("Hours could not be deleted");
-  }
-}
-
-*/

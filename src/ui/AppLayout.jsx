@@ -1,18 +1,21 @@
+import { memo, Suspense } from "react";
 import { Outlet } from "react-router-dom";
-// import Navigation from "./Navigation";
 import Header from "./Header";
 import styled from "styled-components";
+import Spinner from "./Spinner";
 
-/* const StyledAppLayout = styled.div`
-  display: grid;
-  grid-template-columns: auto;
-  grid-template-rows: auto 1fr;
-`;*/
+const Wrapper = styled.main`
+  height: 100vh;
+  background-color: var(--color-slate-100);
+`;
 
 const Main = styled.main`
   background-color: var(--color-slate-100);
   padding: 4rem 4.8rem 6.4rem;
-  overflow: scroll;
+
+  @media (max-width: 350px) {
+    padding: 2rem 2.4rem 3.2rem;
+  }
 `;
 
 const Container = styled.div`
@@ -23,17 +26,20 @@ const Container = styled.div`
   gap: 3.2rem;
 `;
 
+const MemoizedHeader = memo(Header);
+
 function AppLayout() {
   return (
-    <>
-      <Header />
-      {/*<Navigation />*/}
+    <Wrapper>
+      <Suspense fallback={<Spinner />}>
+        <MemoizedHeader />
+      </Suspense>
       <Main>
         <Container>
           <Outlet />
         </Container>
       </Main>
-    </>
+    </Wrapper>
   );
 }
 

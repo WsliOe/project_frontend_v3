@@ -1,25 +1,31 @@
-import styled from "styled-components";
-import LoginForm from "../features/authentication/LoginForm";
-import Logo from "../ui/Logo";
-import Heading from "../ui/Heading";
+import React, { lazy, Suspense } from "react";
+import {
+  Container,
+  BackgroundImage,
+  AuthenticationLayout,
+} from "../ui/Authentication";
+import Spinner from "../ui/Spinner";
 
-const LoginLayout = styled.main`
-  min-height: 100vh;
-  display: grid;
-  grid-template-columns: 48rem;
-  align-content: center;
-  justify-content: center;
-  gap: 3.2rem;
-  background-color: var(--color-slate-50);
-`;
+const Logo = lazy(() => import("../ui/Logo"));
+const Heading = lazy(() => import("../ui/Heading"));
+const LoginForm = lazy(() => import("../features/authentication/LoginForm"));
+
+const MemoizedLogo = React.memo(Logo);
+const MemoizedHeading = React.memo(Heading);
+const MemoizedLoginForm = React.memo(LoginForm);
 
 function Login() {
   return (
-    <LoginLayout>
-      <Logo />
-      <Heading as="h4">Login Mitgliederbereich</Heading>
-      <LoginForm />
-    </LoginLayout>
+    <Container>
+      <BackgroundImage />
+      <AuthenticationLayout>
+        <Suspense fallback={<Spinner />}>
+          <MemoizedLogo />
+          <MemoizedHeading as="h4">Login Mitglieder</MemoizedHeading>
+          <MemoizedLoginForm />
+        </Suspense>
+      </AuthenticationLayout>
+    </Container>
   );
 }
 

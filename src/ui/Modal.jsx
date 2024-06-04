@@ -1,15 +1,16 @@
+import React from "react";
 import { cloneElement, createContext, useContext, useState } from "react";
 import { createPortal } from "react-dom";
 import { HiXMark } from "react-icons/hi2";
-import styled from "styled-components";
 import { useOutsideClick } from "../hooks/useOutsideClick";
+import styled from "styled-components";
 
 const StyledModal = styled.div`
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background-color: var(--color-slate-0);
+  background-color: var(--color-slate-50);
   border-radius: var(--border-radius-lg);
   box-shadow: var(--shadow-lg);
   padding: 3.2rem 4rem;
@@ -46,9 +47,6 @@ const Button = styled.button`
   & svg {
     width: 2.4rem;
     height: 2.4rem;
-    /* Sometimes we need both */
-    /* fill: var(--color-slate-500);
-    stroke: var(--color-slate-500); */
     color: var(--color-slate-500);
   }
 `;
@@ -68,13 +66,13 @@ function Modal({ children }) {
   );
 }
 
-function Open({ children, opens: opensWindowName }) {
+function OpenFunction({ children, opens: opensWindowName }) {
   const { open } = useContext(ModalContext);
 
   return cloneElement(children, { onClick: () => open(opensWindowName) });
 }
 
-function Window({ children, name }) {
+function WindowFunction({ children, name }) {
   const { openName, close } = useContext(ModalContext);
   const ref = useOutsideClick(close);
 
@@ -93,6 +91,9 @@ function Window({ children, name }) {
     document.body
   );
 }
+
+const Open = React.memo(OpenFunction);
+const Window = React.memo(WindowFunction);
 
 Modal.Open = Open;
 Modal.Window = Window;

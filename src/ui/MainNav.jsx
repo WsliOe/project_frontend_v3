@@ -1,24 +1,20 @@
+import React from "react";
 import { NavLink } from "react-router-dom";
+import { IoMdChatboxes } from "react-icons/io";
+import { MdMoreTime } from "react-icons/md";
 import styled from "styled-components";
 
-import { FaUsers } from "react-icons/fa";
-import { IoMdHome, IoMdChatboxes, IoMdSettings } from "react-icons/io";
-import { MdMoreTime } from "react-icons/md";
-
 const NavList = styled.ul`
-  display: grid;
-  flex-direction: column;
-  grid-template-columns: repeat(5, 1fr);
-  justify-items: right;
-  gap: 1rem;
+  display: flex;
+  gap: 2.4rem;
+  align-items: center;
+  justify-content: space-between;
+
+  @media (max-width: 809px) {
+    display: none;
+  }
 `;
 
-/* const NavList = styled.ul`
-  display: flex;
-  flex-direction: row;
-  gap: 1rem;
-`;
-*/
 const StyledNavLink = styled(NavLink)`
   &:link {
     display: flex;
@@ -26,7 +22,7 @@ const StyledNavLink = styled(NavLink)`
     gap: 1.2rem;
 
     color: var(--color-slate-300);
-    font-size: 1.6rem;
+    font-size: 2rem;
     font-weight: 500;
     padding: 1.2rem 2.4rem;
     transition: all 0.3s;
@@ -40,8 +36,8 @@ const StyledNavLink = styled(NavLink)`
   }
 
   & svg {
-    width: 2.4rem;
-    height: 2.4rem;
+    width: 2.9rem;
+    height: 2.9rem;
     color: var(--color-slate-300);
     transition: all 0.3s;
   }
@@ -54,43 +50,32 @@ const StyledNavLink = styled(NavLink)`
   }
 `;
 
-function MainNav() {
+const Text = styled.span`
+  color: var(--color-slate-900);
+  font-weight: 700;
+`;
+
+function Nav() {
   return (
     <nav>
       <NavList>
         <li>
-          <StyledNavLink to="/dashboard">
-            <IoMdHome />
-            <span>Home</span>
-          </StyledNavLink>
-        </li>
-        <li>
           <StyledNavLink to="/hours">
             <MdMoreTime />
-            <span>Stunden</span>
+            <Text>Stunden</Text>
           </StyledNavLink>
         </li>
         <li>
-          <StyledNavLink to="/chatHome">
+          <StyledNavLink to="/chat-home">
             <IoMdChatboxes />
-            <span>Chat</span>
-          </StyledNavLink>
-        </li>
-        <li>
-          <StyledNavLink to="/users">
-            <FaUsers />
-            <span>Mitglieder</span>
-          </StyledNavLink>
-        </li>
-        <li>
-          <StyledNavLink to="/settings">
-            <IoMdSettings />
-            <span>Einstellungen</span>
+            <Text>Chat</Text>
           </StyledNavLink>
         </li>
       </NavList>
     </nav>
   );
 }
+
+const MainNav = React.memo(Nav);
 
 export default MainNav;

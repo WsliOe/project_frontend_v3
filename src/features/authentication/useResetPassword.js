@@ -1,21 +1,22 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { signup as signupApi } from "../../services/apiAuth";
+import { resetPassword as resetPasswordApi } from "../../services/apiAuth";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import toast from "react-hot-toast";
 
-export function useSignup() {
+export function useResetPassword() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
-  const { mutate: signup, isPending: isLoading } = useMutation({
-    mutationFn: signupApi,
+  const { mutate: resetPassword, isPending: isLoading } = useMutation({
+    mutationFn: ({ token, password, passwordConfirm }) =>
+      resetPasswordApi(token, password, passwordConfirm),
     onSuccess: (user) => {
       queryClient.setQueryData(["user"], user);
       Cookies.set("jwt", user.token);
-      toast.success("Erfolgreich registriert.");
+      toast.success("Passwort erfolgreich zurückgesetzt.");
       setTimeout(() => {
-        navigate("/hours", { replace: true });
+        navigate("/login", { replace: true });
       }, 1000);
     },
     onError: (err) => {
@@ -23,5 +24,5 @@ export function useSignup() {
     },
   });
 
-  return { signup, isLoading };
+  return { resetPassword, isLoading };
 }

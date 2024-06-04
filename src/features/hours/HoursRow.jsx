@@ -1,105 +1,70 @@
-import styled from "styled-components";
-
-import CreateHoursForm from "./CreateHoursForm";
+import { lazy } from "react";
 import { useDeleteHours } from "./useDeleteHours";
-import { formatCurrency } from "../../utils/helpers";
-import { HiPencil, HiSquare2Stack, HiTrash } from "react-icons/hi2";
-import { useCreateHours } from "./useCreateHours";
+import { HiPencil } from "react-icons/hi2";
+import { HiTrash } from "react-icons/hi2";
 import Modal from "../../ui/Modal";
 import ConfirmDelete from "../../ui/ConfirmDelete";
 import Table from "../../ui/Table";
 import Menus from "../../ui/Menus";
+import styled from "styled-components";
 
-const Img = styled.img`
-  display: block;
-  width: 6.4rem;
-  aspect-ratio: 3 / 2;
-  object-fit: cover;
-  object-position: center;
-  transform: scale(1.5) translateX(-7px);
-`;
+const CreateHoursForm = lazy(() => import("./CreateHoursForm"));
 
 const Hours = styled.div`
   font-size: 1.6rem;
   font-weight: 600;
-  color: var(--color-slate-600);
-  font-family: "Sono";
+  color: var(--color-lime-800);
 `;
 
-const Price = styled.div`
-  font-family: "Sono";
-  font-weight: 600;
-`;
-
-const Discount = styled.div`
-  font-family: "Sono";
-  font-weight: 500;
-  color: var(--color-green-700);
+const BoldCell = styled.div`
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--color-lime-800);
 `;
 
 function HoursRow({ hours }) {
   const { isDeleting, deleteHours } = useDeleteHours();
-  const { isCreating, createHours } = useCreateHours();
 
-  const {
-    id: hoursId,
-    name,
-    maxCapacity,
-    regularPrice,
-    discount,
-    image,
-    description,
-  } = hours;
+  const { _id: hoursId, year, Q1, Q2, Q3, Q4 } = hours;
 
-  function handleDuplicate() {
-    createHours({
-      name: `Copy of ${name}`,
-      maxCapacity,
-      regularPrice,
-      discount,
-      image,
-      description,
-    });
-  }
+  const isValidNumber = (value) => typeof value === "number" && !isNaN(value);
+
+  const totalHoursYear =
+    (isValidNumber(Q1) ? Q1 : 0) +
+    (isValidNumber(Q2) ? Q2 : 0) +
+    (isValidNumber(Q3) ? Q3 : 0) +
+    (isValidNumber(Q4) ? Q4 : 0);
 
   return (
     <Table.Row>
-      <Img src={image} />
-      <Hours>{name}</Hours>
-      <div>Fits up to {maxCapacity} guests</div>
-      <Price>{formatCurrency(regularPrice)}</Price>
-      {discount ? (
-        <Discount>{formatCurrency(discount)}</Discount>
-      ) : (
-        <span>&mdash;</span>
-      )}
+      <BoldCell data-label="Jahr">{year}</BoldCell>
+      <Hours data-label="Q1">{Q1}</Hours>
+      <Hours data-label="Q2">{Q2}</Hours>
+      <Hours data-label="Q3">{Q3}</Hours>
+      <Hours data-label="Q4">{Q4}</Hours>
+      <BoldCell data-label="Total">{totalHoursYear}</BoldCell>
+
       <div>
         <Modal>
           <Menus.Menu>
-            <Menus.Toggle id={hoursId} />
+            <Menus.Toggle _id={hoursId} />
 
-            <Menus.List id={hoursId}>
-              <Menus.Button
-                icon={<HiSquare2Stack />}
-                onClick={handleDuplicate}
-                disabled={isCreating}
-              >
-                Duplicate
-              </Menus.Button>
-
+            <Menus.List _id={hoursId}>
               <Modal.Open opens="edit">
-                <Menus.Button icon={<HiPencil />}>Edit</Menus.Button>
+                <Menus.Button icon={<HiPencil />} label="Bearbeiten">
+                  Bearbeiten
+                </Menus.Button>
               </Modal.Open>
 
               <Modal.Open opens="delete">
-                <Menus.Button icon={<HiTrash />}>Delete</Menus.Button>
+                <Menus.Button icon={<HiTrash />} label="Löschen">
+                  Löschen
+                </Menus.Button>
               </Modal.Open>
             </Menus.List>
-
             <Modal.Window name="edit">
               <CreateHoursForm hoursToEdit={hours} />
             </Modal.Window>
-
             <Modal.Window name="delete">
               <ConfirmDelete
                 resourceName="hours"

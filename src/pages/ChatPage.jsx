@@ -1,39 +1,16 @@
-import { useEffect, useState, useRef } from "react";
-import ChatBar from "../features/chat/ChatBar";
-import ChatBody from "../features/chat/ChatBody";
-import ChatFooter from "../features/chat/ChatFooter";
+import { memo, lazy, Suspense } from "react";
+import Spinner from "../ui/Spinner";
 
-const ChatPage = ({ socket }) => {
-  const [messages, setMessages] = useState([]);
-  const [typingStatus, setTypingStatus] = useState("");
-  const lastMessageRef = useRef(null);
+const Chatting = lazy(() => import("../features/chat/Chatting"));
 
-  useEffect(() => {
-    socket.on("messageResponse", (data) => setMessages([...messages, data]));
-  }, [socket, messages]);
+const MemoizedChatting = memo(Chatting);
 
-  useEffect(() => {
-    socket.on("typingResponse", (data) => setTypingStatus(data));
-  }, [socket]);
-
-  useEffect(() => {
-    // scroll to bottom every time messages change
-    lastMessageRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
-
+function ChatPage({ socket }) {
   return (
-    <div className="chat">
-      <ChatBar socket={socket} />
-      <div className="chat__main">
-        <ChatBody
-          messages={messages}
-          typingStatus={typingStatus}
-          lastMessageRef={lastMessageRef}
-        />
-        <ChatFooter socket={socket} />
-      </div>
-    </div>
+    <Suspense fallback={<Spinner />}>
+      <MemoizedChatting socket={socket} />
+    </Suspense>
   );
-};
+}
 
 export default ChatPage;

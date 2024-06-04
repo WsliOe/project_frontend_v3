@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { ChatSidebar, ChatHeader, ChatUsers } from "../../ui/ChatSidebar";
 
 const ChatBar = ({ socket }) => {
   const [users, setUsers] = useState([]);
@@ -8,17 +9,17 @@ const ChatBar = ({ socket }) => {
   }, [socket, users]);
 
   return (
-    <div className="chat__sidebar">
+    <ChatSidebar>
       <h2>Chat</h2>
       <div>
-        <h4 className="chat__header">Aktive User</h4>
-        <div className="chat__users">
+        <ChatHeader>Aktive User</ChatHeader>
+        <ChatUsers>
           {users.map((user) => (
             <p key={user.socketID}>{user.userName}</p>
           ))}
-        </div>
+        </ChatUsers>
       </div>
-    </div>
+    </ChatSidebar>
   );
 };
 

@@ -1,20 +1,41 @@
+import React from "react";
 import { useForm } from "react-hook-form";
-import Button from "../../ui/Button";
-import Form from "../../ui/Form";
-import FormRow from "../../ui/FormRow";
-import Input from "../../ui/Input";
+import { useNavigate } from "react-router-dom";
 import { useSignup } from "./useSignup";
+import styled from "styled-components";
+
+const Button = React.lazy(() => import("../../ui/Button"));
+const Form = React.lazy(() => import("../../ui/Form"));
+const FormRowVertical = React.lazy(() => import("../../ui/FormRowVertical"));
+const Input = React.lazy(() => import("../../ui/Input"));
+const SpinnerMini = React.lazy(() => import("../../ui/SpinnerMini"));
 
 // Email regex: /\S+@\S+\.\S+/
+
+const GoToLogin = styled.div`
+  text-align: center;
+  font-size: 1.4rem;
+  font-weight: 500;
+  line-height: 150%;
+  margin-top: 2.4rem;
+  display: flex;
+  justify-content: center;
+`;
+
+const LoginRoute = styled.span`
+  color: #633cff;
+  cursor: pointer;
+`;
 
 function SignupForm() {
   const { signup, isLoading } = useSignup();
   const { register, formState, getValues, handleSubmit, reset } = useForm();
   const { errors } = formState;
+  const navigate = useNavigate();
 
-  function onSubmit({ fullName, email, password }) {
+  function onSubmit({ firstName, lastName, email, password, passwordConfirm }) {
     signup(
-      { fullName, email, password },
+      { firstName, lastName, email, password, passwordConfirm },
       {
         onSettled: () => reset(),
       }
@@ -23,21 +44,33 @@ function SignupForm() {
 
   return (
     <Form onSubmit={handleSubmit(onSubmit)}>
-      <FormRow label="Name" error={errors?.fullName?.message}>
+      <FormRowVertical label="Vorname" error={errors?.firstName?.message}>
         <Input
           type="text"
-          id="fullName"
+          id="firstName"
           disabled={isLoading}
-          {...register("fullName", {
+          {...register("firstName", {
             required: "Eingabefeld ist auszufüllen.",
           })}
         />
-      </FormRow>
+      </FormRowVertical>
 
-      <FormRow label="E-Mail" error={errors?.email?.message}>
+      <FormRowVertical label="Nachname" error={errors?.lastName?.message}>
+        <Input
+          type="text"
+          id="lastName"
+          disabled={isLoading}
+          {...register("lastName", {
+            required: "Eingabefeld ist auszufüllen.",
+          })}
+        />
+      </FormRowVertical>
+
+      <FormRowVertical label="E-Mail" error={errors?.email?.message}>
         <Input
           type="email"
           id="email"
+          autoComplete="username"
           disabled={isLoading}
           {...register("email", {
             required: "Eingabefeld ist auszufüllen.",
@@ -47,15 +80,16 @@ function SignupForm() {
             },
           })}
         />
-      </FormRow>
+      </FormRowVertical>
 
-      <FormRow
+      <FormRowVertical
         label="Passwort (mind. 6 Zeichen)"
         error={errors?.password?.message}
       >
         <Input
           type="password"
           id="password"
+          autoComplete="new-password"
           disabled={isLoading}
           {...register("password", {
             required: "Eingabefeld ist auszufüllen.",
@@ -65,15 +99,16 @@ function SignupForm() {
             },
           })}
         />
-      </FormRow>
+      </FormRowVertical>
 
-      <FormRow
-        label="Passwort wiederholen"
+      <FormRowVertical
+        label="Passwort bestätigen"
         error={errors?.passwordConfirm?.message}
       >
         <Input
           type="password"
           id="passwordConfirm"
+          autoComplete="new-password"
           disabled={isLoading}
           {...register("passwordConfirm", {
             required: "Eingabefeld ist auszufüllen.",
@@ -82,19 +117,28 @@ function SignupForm() {
               "Passwörter müssen übereinstimmen.",
           })}
         />
-      </FormRow>
+      </FormRowVertical>
 
-      <FormRow>
+      <FormRowVertical>
+        <Button size="large" disabled={isLoading}>
+          {!isLoading ? "Erstellen" : <SpinnerMini />}
+        </Button>
         <Button
           variation="secondary"
           type="reset"
           disabled={isLoading}
-          onClick={reset}
+          onClick={() => {
+            reset();
+            navigate("/login");
+          }}
         >
           Abbrechen
         </Button>
-        <Button disabled={isLoading}>Erstellen</Button>
-      </FormRow>
+      </FormRowVertical>
+      <GoToLogin>
+        Bereits ein Account?&nbsp;{" "}
+        <LoginRoute onClick={() => navigate("/login")}>Login</LoginRoute>
+      </GoToLogin>
     </Form>
   );
 }

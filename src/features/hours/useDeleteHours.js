@@ -20,27 +20,3 @@ export function useDeleteHours() {
 
   return { deleteHours, isDeleting };
 }
-
-/*
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "react-hot-toast";
-import { deleteHours as deleteHoursApi } from "../../services/apiHours";
-
-export function useDeleteHours() {
-  const queryClient = useQueryClient();
-
-  const { isLoading: isDeleting, mutate: deleteHours } = useMutation({
-    mutationFn: deleteHoursApi,
-    onSuccess: () => {
-      toast.success("Hours successfully deleted");
-
-      queryClient.invalidateQueries({
-        queryKey: ["hours"],
-      });
-    },
-    onError: (err) => toast.error(err.message),
-  });
-
-  return { isDeleting, deleteHours };
-}
-*/

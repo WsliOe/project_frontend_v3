@@ -1,3 +1,4 @@
+import React from "react";
 import { createContext, useContext, useState } from "react";
 import { createPortal } from "react-dom";
 import { HiEllipsisVertical } from "react-icons/hi2";
@@ -32,7 +33,7 @@ const StyledToggle = styled.button`
 const StyledList = styled.ul`
   position: fixed;
 
-  background-color: var(--color-slate-0);
+  background-color: var(--color-slate-50);
   box-shadow: var(--shadow-md);
   border-radius: var(--border-radius-md);
 
@@ -83,7 +84,7 @@ function Menus({ children }) {
   );
 }
 
-function Toggle({ id }) {
+function ToggleFunction({ _id }) {
   const { openId, close, open, setPosition } = useContext(MenusContext);
 
   function handleClick(e) {
@@ -95,21 +96,21 @@ function Toggle({ id }) {
       y: rect.y + rect.height + 8,
     });
 
-    openId === "" || openId !== id ? open(id) : close();
+    openId === "" || openId !== _id ? open(_id) : close();
   }
 
   return (
-    <StyledToggle onClick={handleClick}>
+    <StyledToggle onClick={handleClick} aria-label="Menü öffnen">
       <HiEllipsisVertical />
     </StyledToggle>
   );
 }
 
-function List({ id, children }) {
+function ListFunction({ _id, children }) {
   const { openId, position, close } = useContext(MenusContext);
   const ref = useOutsideClick(close, false);
 
-  if (openId !== id) return null;
+  if (openId !== _id) return null;
 
   return createPortal(
     <StyledList position={position} ref={ref}>
@@ -119,7 +120,7 @@ function List({ id, children }) {
   );
 }
 
-function Button({ children, icon, onClick }) {
+function ButtonFunction({ children, icon, onClick, label }) {
   const { close } = useContext(MenusContext);
 
   function handleClick() {
@@ -129,13 +130,17 @@ function Button({ children, icon, onClick }) {
 
   return (
     <li>
-      <StyledButton onClick={handleClick}>
+      <StyledButton onClick={handleClick} role="button" aria-label={label}>
         {icon}
         <span>{children}</span>
       </StyledButton>
     </li>
   );
 }
+
+const Toggle = React.memo(ToggleFunction);
+const List = React.memo(ListFunction);
+const Button = React.memo(ButtonFunction);
 
 Menus.Menu = Menu;
 Menus.Toggle = Toggle;

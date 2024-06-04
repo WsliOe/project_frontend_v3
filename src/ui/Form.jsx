@@ -6,8 +6,7 @@ const Form = styled.form`
     css`
       padding: 2.4rem 4rem;
 
-      /* Box */
-      background-color: var(--color-slate-0);
+      background-color: var(--color-slate-50);
       border: 1px solid var(--color-slate-100);
       border-radius: var(--border-radius-md);
     `}
@@ -15,7 +14,7 @@ const Form = styled.form`
   ${(props) =>
     props.type === "modal" &&
     css`
-      width: 80rem;
+      width: 20rem;
     `}
     
   overflow: hidden;

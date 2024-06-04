@@ -1,47 +1,57 @@
 import { useNavigate } from "react-router-dom";
+import {
+  ChatMainHeader,
+  LeaveChatButton,
+  MessageContainer,
+  MessageRecipient,
+  MessageSender,
+  MessageChats,
+  SenderName,
+} from "../../ui/ChatBody";
 
-const ChatBody = ({ messages, typingStatus, lastMessageRef }) => {
+const ChatBody = ({ messages, lastMessageRef }) => {
   const navigate = useNavigate();
 
   const handleLeaveChat = () => {
     localStorage.removeItem("userName");
-    navigate("/chatHome");
+    navigate("/chat-home");
     window.location.reload();
   };
 
   return (
     <>
-      <header className="chat__mainHeader">
+      <ChatMainHeader>
         <p>Chatroom</p>
-        <button className="leaveChat__btn" onClick={handleLeaveChat}>
+        <LeaveChatButton
+          variation="secondary"
+          type="reset"
+          onClick={handleLeaveChat}
+        >
           Chat verlassen
-        </button>
-      </header>
+        </LeaveChatButton>
+      </ChatMainHeader>
 
-      <div className="message__container">
+      <MessageContainer>
         {messages.map((message) =>
           message.name === localStorage.getItem("userName") ? (
-            <div className="message__chats" key={message.id}>
-              <p className="sender__name">Du</p>
-              <div className="message__sender">
+            <MessageChats key={message.id}>
+              <SenderName>Du</SenderName>
+              <MessageSender>
                 <p>{message.text}</p>
-              </div>
-            </div>
+              </MessageSender>
+            </MessageChats>
           ) : (
-            <div className="message__chats" key={message.id}>
+            <MessageChats key={message.id}>
               <p>{message.name}</p>
-              <div className="message__recipient">
+              <MessageRecipient>
                 <p>{message.text}</p>
-              </div>
-            </div>
+              </MessageRecipient>
+            </MessageChats>
           )
         )}
 
-        <div className="message__status">
-          <p>{typingStatus}</p>
-        </div>
         <div ref={lastMessageRef} />
-      </div>
+      </MessageContainer>
     </>
   );
 };

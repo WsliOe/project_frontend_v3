@@ -1,9 +1,10 @@
+import React, { useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import styled, { css } from "styled-components";
 
 const StyledFilter = styled.div`
   border: 1px solid var(--color-slate-100);
-  background-color: var(--color-slate-0);
+  background-color: var(--color-slate-50);
   box-shadow: var(--shadow-sm);
   border-radius: var(--border-radius-sm);
   padding: 0.4rem;
@@ -12,11 +13,11 @@ const StyledFilter = styled.div`
 `;
 
 const FilterButton = styled.button`
-  background-color: var(--color-slate-0);
+  background-color: var(--color-slate-50);
   border: none;
 
   ${(props) =>
-    props.active &&
+    props.$active &&
     css`
       background-color: var(--color-lime-600);
       color: var(--color-lime-50);
@@ -25,9 +26,14 @@ const FilterButton = styled.button`
   border-radius: var(--border-radius-sm);
   font-weight: 500;
   font-size: 1.4rem;
-  /* To give the same height as select */
+
   padding: 0.44rem 0.8rem;
   transition: all 0.3s;
+
+  @media (max-width: 569px) {
+    font-size: 1.1rem;
+    padding: 0.2rem 0.4rem;
+  }
 
   &:hover:not(:disabled) {
     background-color: var(--color-lime-600);
@@ -35,9 +41,11 @@ const FilterButton = styled.button`
   }
 `;
 
-function Filter({ filterField, options }) {
+function FilterFunction({ filterField, options }) {
   const [searchParams, setSearchParams] = useSearchParams();
-  const currentFilter = searchParams.get(filterField) || options.at(0).value;
+  const memoizedOptions = useMemo(() => options, [options]);
+  const currentFilter =
+    searchParams.get(filterField) || memoizedOptions.at(0).value;
 
   function handleClick(value) {
     searchParams.set(filterField, value);
@@ -48,11 +56,11 @@ function Filter({ filterField, options }) {
 
   return (
     <StyledFilter>
-      {options.map((option) => (
+      {memoizedOptions.map((option) => (
         <FilterButton
           key={option.value}
           onClick={() => handleClick(option.value)}
-          active={option.value === currentFilter}
+          $active={option.value === currentFilter}
           disabled={option.value === currentFilter}
         >
           {option.label}
@@ -61,5 +69,7 @@ function Filter({ filterField, options }) {
     </StyledFilter>
   );
 }
+
+const Filter = React.memo(FilterFunction);
 
 export default Filter;

@@ -1,45 +1,18 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import Heading from "../ui/Heading";
-import Row from "../ui/Row";
+import { memo, lazy, Suspense } from "react";
+import Spinner from "../ui/Spinner";
 
-const ChatHome = ({ socket }) => {
-  const navigate = useNavigate();
-  const [userName, setUserName] = useState("");
+const Row = lazy(() => import("../ui/Row"));
+const JoinChat = lazy(() => import("../features/chat/JoinChat"));
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    localStorage.setItem("userName", userName);
-    socket.emit("newUser", { userName, socketID: socket.id });
-    navigate("/chatPage");
-  };
+const MemoizedJoinChat = memo(JoinChat);
 
-  /*return (
-    <Row type="horizontal">
-      <Heading as="h1">Chat</Heading>
-    </Row>
-  );*/
-
+function ChatHome({ socket }) {
   return (
-    <>
-      <Row type="horizontal">
-        <Heading as="h1">Chat</Heading>
-      </Row>
-      <form className="home__container" onSubmit={handleSubmit}>
-        <h2 className="home__header">Chat beitreten</h2>
-        <label htmlFor="username">Name</label>
-        <input
-          type="text"
-          name="username"
-          id="username"
-          className="username__input"
-          value={userName}
-          onChange={(e) => setUserName(e.target.value)}
-        />
-        <button className="home__cta">Beitreten</button>
-      </form>
-    </>
+    <Suspense fallback={<Spinner />}>
+      <Row type="horizontal"></Row>
+      <MemoizedJoinChat socket={socket} />
+    </Suspense>
   );
-};
+}
 
 export default ChatHome;

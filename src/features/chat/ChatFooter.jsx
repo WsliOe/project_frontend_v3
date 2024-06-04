@@ -1,4 +1,11 @@
 import { useState } from "react";
+import {
+  ChatFooterContainer,
+  Form,
+  Message,
+  SendButton,
+} from "../../ui/ChatFooter";
+import SendIconButton from "../../ui/SendIconButton";
 
 const ChatFooter = ({ socket }) => {
   const [message, setMessage] = useState("");
@@ -18,19 +25,25 @@ const ChatFooter = ({ socket }) => {
     setMessage("");
   };
   return (
-    <div className="chat__footer">
-      <form className="form" onSubmit={handleSendMessage}>
-        <input
+    <ChatFooterContainer>
+      <Form onSubmit={handleSendMessage}>
+        <Message
           type="text"
+          id="message"
           placeholder="Nachricht schreiben"
-          className="message"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           onKeyDown={handleTyping}
         />
-        <button className="sendBtn">Senden</button>
-      </form>
-    </div>
+        <SendIconButton
+          aria-label="Nachricht senden"
+          title="Nachricht senden"
+        />
+        <SendButton aria-label="Senden" title="Senden">
+          Senden
+        </SendButton>
+      </Form>
+    </ChatFooterContainer>
   );
 };
 

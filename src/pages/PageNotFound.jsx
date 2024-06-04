@@ -1,5 +1,4 @@
 import styled from "styled-components";
-
 import { useMoveBack } from "../hooks/useMoveBack";
 import Heading from "../ui/Heading";
 
@@ -13,8 +12,7 @@ const StyledPageNotFound = styled.main`
 `;
 
 const Box = styled.div`
-  /* box */
-  background-color: var(--color-slate-0);
+  background-color: var(--color-slate-50);
   border: 1px solid var(--color-slate-100);
   border-radius: var(--border-radius-md);
 

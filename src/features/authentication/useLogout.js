@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { logout as logoutApi } from "../../services/apiAuth";
 import { useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
 
 export function useLogout() {
   const navigate = useNavigate();
@@ -9,6 +10,7 @@ export function useLogout() {
   const { mutate: logout, isLoading } = useMutation({
     mutationFn: logoutApi,
     onSuccess: () => {
+      Cookies.remove("jwt");
       queryClient.removeQueries();
       navigate("/login", { replace: true });
     },

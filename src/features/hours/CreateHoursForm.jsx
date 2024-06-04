@@ -1,157 +1,187 @@
-import { useForm } from "react-hook-form";
+import { useEffect, lazy, Suspense } from "react";
+import { useForm, Controller } from "react-hook-form";
 
-import Input from "../../ui/Input";
-import Form from "../../ui/Form";
-import Button from "../../ui/Button";
-import FileInput from "../../ui/FileInput";
-import Textarea from "../../ui/Textarea";
-import FormRow from "../../ui/FormRow";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import styled from "styled-components";
 
 import { useCreateHours } from "./useCreateHours";
-import { useUpdateHours } from "./useUpdateHours";
+import { useEditHours } from "./useEditHours";
+import Spinner from "../../ui/Spinner";
 
-function CreateHoursForm({ hoursToEdit = {}, onCloseModal }) {
-  const { createHours, isCreating } = useCreateHours();
-  const { updateHours, isUpdating } = useUpdateHours();
-  const isWorking = isCreating || isUpdating;
+const Button = lazy(() => import("../../ui/Button"));
+const Form = lazy(() => import("../../ui/Form"));
+const Input = lazy(() => import("../../ui/Input"));
+const FormRowVertical = lazy(() => import("../../ui/FormRowVertical"));
 
-  const { id: hoursId, ...editValues } = hoursToEdit;
-  const isEditSession = Boolean(hoursId);
-
-  const { register, handleSubmit, reset, getValues, formState } = useForm({
-    defaultValues: isEditSession ? editValues : {},
-  });
-  const { errors } = formState;
-
-  function onSubmit(data) {
-    const image = typeof data.image === "string" ? data.image : data.image[0];
-
-    if (isEditSession)
-      updateHours(
-        { newHoursData: { ...data, image }, id: hoursId },
-        {
-          onSuccess: (data) => {
-            reset();
-            onCloseModal?.();
-          },
-        }
-      );
-    else
-      createHours(
-        { ...data, image: image },
-        {
-          onSuccess: (data) => {
-            reset();
-            onCloseModal?.();
-          },
-        }
-      );
+const CustomDatePickerWrapper = styled.div`
+  .react-datepicker {
+    font-family: "Nunito", sans-serif;
+    font-size: 1.5rem;
+  }
+  .react-datepicker-popper[data-placement^="bottom"]
+    .react-datepicker__triangle {
+    fill: #fff;
+    color: #fff;
   }
 
-  function onError(errors) {
-    // console.log(errors);
+  .react-datepicker__header {
+    background-color: #fff;
+  }
+
+  .react-datepicker-year-header {
+    color: #fff;
+  }
+
+  .react-datepicker__year-wrapper {
+    margin: 10px 60px;
+    flex-direction: column;
+  }
+
+  .react-datepicker__year-text--selected,
+  .react-datepicker__year-text--in-selecting-range,
+  .react-datepicker__year-text--in-range,
+  .react-datepicker__year-text--keyboard-selected {
+    background-color: var(--color-lime-700);
+    color: #fff;
+  }
+`;
+
+function CreateHoursForm({ hoursToEdit = {}, onCloseModal }) {
+  const { isCreating, createHours } = useCreateHours();
+  const { isEditing, editHours } = useEditHours();
+
+  const isWorking = isCreating || isEditing;
+
+  const { _id: editId, ...editValues } = hoursToEdit;
+  const isEditSession = Boolean(editId);
+
+  useEffect(() => {
+    if (editValues.year && typeof editValues.year === "number") {
+      editValues.year = new Date(editValues.year, 0, 1);
+    }
+  }, [editValues.year, editValues]);
+
+  const defaultValues = isEditSession
+    ? { ...editValues }
+    : { year: new Date(), Q1: "", Q2: "", Q3: "", Q4: "" };
+
+  const { register, handleSubmit, reset, control, formState } = useForm({
+    defaultValues,
+  });
+
+  const { errors } = formState;
+
+  const calculateTotal = (data) => {
+    const totalHoursYear =
+      (parseFloat(data.Q1) || 0) +
+      (parseFloat(data.Q2) || 0) +
+      (parseFloat(data.Q3) || 0) +
+      (parseFloat(data.Q4) || 0);
+
+    return totalHoursYear;
+  };
+
+  function onSubmit(data) {
+    const year = data.year instanceof Date ? data.year.getFullYear() : null;
+
+    const totalHoursYear = calculateTotal(data);
+
+    const newData = { ...data, year, totalHoursYear };
+
+    if (isEditSession) {
+      editHours(
+        { newHoursData: newData, _id: editId },
+        {
+          onSuccess: () => {
+            reset();
+            onCloseModal?.();
+          },
+        }
+      );
+    } else {
+      createHours(newData, {
+        onSuccess: () => {
+          reset();
+          onCloseModal?.();
+        },
+      });
+    }
   }
 
   return (
-    <Form
-      onSubmit={handleSubmit(onSubmit, onError)}
-      type={onCloseModal ? "modal" : "regular"}
-    >
-      <FormRow label="Hours name" error={errors?.name?.message}>
-        <Input
-          type="text"
-          id="name"
-          disabled={isWorking}
-          {...register("name", {
-            required: "This field is required",
-          })}
-        />
-      </FormRow>
-
-      <FormRow label="Maximum capacity" error={errors?.maxCapacity?.message}>
-        <Input
-          type="number"
-          id="maxCapacity"
-          disabled={isWorking}
-          {...register("maxCapacity", {
-            required: "This field is required",
-            min: {
-              value: 1,
-              message: "Capacity should be at least 1",
-            },
-          })}
-        />
-      </FormRow>
-
-      <FormRow label="Regular price" error={errors?.regularPrice?.message}>
-        <Input
-          type="number"
-          id="regularPrice"
-          disabled={isWorking}
-          {...register("regularPrice", {
-            required: "This field is required",
-            min: {
-              value: 1,
-              message: "Capacity should be at least 1",
-            },
-          })}
-        />
-      </FormRow>
-
-      <FormRow label="Discount" error={errors?.discount?.message}>
-        <Input
-          type="number"
-          id="discount"
-          disabled={isWorking}
-          defaultValue={0}
-          {...register("discount", {
-            required: "This field is required",
-            validate: (value) =>
-              value <= getValues().regularPrice ||
-              "Discount should be less than regular price",
-          })}
-        />
-      </FormRow>
-
-      <FormRow
-        label="Description for website"
-        error={errors?.description?.message}
+    <Suspense fallback={<Spinner />}>
+      <Form
+        onSubmit={handleSubmit(onSubmit)}
+        type={onCloseModal ? "modal" : "regular"}
       >
-        <Textarea
-          type="number"
-          id="description"
-          defaultValue=""
-          disabled={isWorking}
-          {...register("description", {
-            required: "This field is required",
-          })}
-        />
-      </FormRow>
+        <FormRowVertical label="Jahr" error={errors?.year?.message}>
+          <Controller
+            control={control}
+            name="year"
+            rules={{ required: "zwingend" }}
+            render={({ field }) => (
+              <CustomDatePickerWrapper>
+                <DatePicker
+                  {...field}
+                  selected={field.value || new Date()}
+                  onChange={(date) => field.onChange(date)}
+                  showYearPicker
+                  dateFormat="yyyy"
+                  yearItemNumber={3}
+                  minDate={new Date("2017-01-01")}
+                  maxDate={new Date("2100-12-31")}
+                  disabled={isWorking}
+                  customInput={
+                    <Input
+                      id="year"
+                      style={{ width: "105.5%" }}
+                      autoComplete="off"
+                      aria-label="Jahr"
+                    />
+                  }
+                />
+              </CustomDatePickerWrapper>
+            )}
+          />
+        </FormRowVertical>
 
-      <FormRow label="Hours photo">
-        <FileInput
-          id="image"
-          accept="image/*"
-          {...register("image", {
-            required: isEditSession ? false : "This field is required",
-          })}
-        />
-      </FormRow>
+        {[1, 2, 3, 4].map((quarter) => (
+          <FormRowVertical
+            key={quarter}
+            label={`${quarter}. Quartal`}
+            error={errors[`Q${quarter}`]?.message}
+          >
+            <Input
+              type="number"
+              id={`Q${quarter}`}
+              disabled={isWorking}
+              defaultValue=""
+              min={0}
+              {...register(`Q${quarter}`, {
+                min: {
+                  value: 0,
+                  message: "Mind. 0.",
+                },
+              })}
+            />
+          </FormRowVertical>
+        ))}
 
-      <FormRow>
-        {/* type is an HTML attribute! */}
-        <Button
-          variation="secondary"
-          type="reset"
-          onClick={() => onCloseModal?.()}
-        >
-          Cancel
-        </Button>
-        <Button disabled={isWorking}>
-          {isEditSession ? "Edit hours" : "Create new hours"}
-        </Button>
-      </FormRow>
-    </Form>
+        <FormRowVertical>
+          <Button disabled={isWorking}>
+            {isEditSession ? "Anpassen" : "Senden"}
+          </Button>
+          <Button
+            variation="secondary"
+            type="reset"
+            onClick={() => onCloseModal?.()}
+          >
+            Abbrechen
+          </Button>
+        </FormRowVertical>
+      </Form>
+    </Suspense>
   );
 }
 

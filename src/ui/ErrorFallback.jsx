@@ -1,7 +1,10 @@
+import React, { lazy, Suspense } from "react";
 import styled from "styled-components";
-import Heading from "./Heading";
-import GlobalStyles from "../styles/GlobalStyles";
-import Button from "./Button";
+import Spinner from "./Spinner";
+
+const Button = lazy(() => import("./Button"));
+const Heading = lazy(() => import("./Heading"));
+const GlobalStyles = lazy(() => import("../styles/GlobalStyles"));
 
 const StyledErrorFallback = styled.main`
   height: 100vh;
@@ -13,8 +16,7 @@ const StyledErrorFallback = styled.main`
 `;
 
 const Box = styled.div`
-  /* Box */
-  background-color: var(--color-slate-0);
+  background-color: var(--color-slate-50);
   border: 1px solid var(--color-slate-100);
   border-radius: var(--border-radius-md);
 
@@ -32,21 +34,25 @@ const Box = styled.div`
     color: var(--color-slate-500);
   }
 `;
-function ErrorFallback({ error, resetErrorBoundary }) {
+function Error({ error, resetErrorBoundary }) {
   return (
     <>
-      <GlobalStyles />
-      <StyledErrorFallback>
-        <Box>
-          <Heading as="h1">Etwas ist schiefgelaufen.</Heading>
-          <p>{error.message}</p>
-          <Button size="large" onClick={resetErrorBoundary}>
-            Erneut versuchen
-          </Button>
-        </Box>
-      </StyledErrorFallback>
+      <Suspense fallback={<Spinner />}>
+        <GlobalStyles />
+        <StyledErrorFallback>
+          <Box>
+            <Heading as="h1">Etwas ist schiefgelaufen.</Heading>
+            <p>{error.message}</p>
+            <Button size="large" onClick={resetErrorBoundary}>
+              Erneut versuchen
+            </Button>
+          </Box>
+        </StyledErrorFallback>
+      </Suspense>
     </>
   );
 }
+
+const ErrorFallback = React.memo(Error);
 
 export default ErrorFallback;

@@ -31,11 +31,11 @@ const variations = {
   `,
   secondary: css`
     color: var(--color-slate-600);
-    background: var(--color-slate-0);
+    background: var(--color-slate-50);
     border: 1px solid var(--color-slate-200);
 
     &:hover {
-      background-color: var(--color-slate-50);
+      background-color: var(--color-slate-100);
     }
   `,
   danger: css`
@@ -60,6 +60,7 @@ const Button = styled.button`
 Button.defaultProps = {
   variation: "primary",
   size: "medium",
+  role: "button",
 };
 
 export default Button;
